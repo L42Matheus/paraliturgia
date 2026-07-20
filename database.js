@@ -18,6 +18,7 @@ db.exec(`
     bairro TEXT NOT NULL DEFAULT '',
     estado_civil TEXT NOT NULL DEFAULT '',
     batizado INTEGER NOT NULL DEFAULT 0,
+    fez_primeira_comunhao INTEGER NOT NULL DEFAULT 0,
     primeira_comunhao TEXT NOT NULL DEFAULT '',
     fez_ejc INTEGER NOT NULL DEFAULT 0,
     ejc_local TEXT NOT NULL DEFAULT '',
@@ -39,6 +40,7 @@ const novasColunas = [
   ['bairro', "TEXT NOT NULL DEFAULT ''"],
   ['estado_civil', "TEXT NOT NULL DEFAULT ''"],
   ['batizado', 'INTEGER NOT NULL DEFAULT 0'],
+  ['fez_primeira_comunhao', 'INTEGER NOT NULL DEFAULT 0'],
   ['primeira_comunhao', "TEXT NOT NULL DEFAULT ''"],
   ['fez_ejc', 'INTEGER NOT NULL DEFAULT 0'],
   ['ejc_local', "TEXT NOT NULL DEFAULT ''"],
@@ -55,14 +57,16 @@ for (const [col, spec] of novasColunas) {
 const insertStmt = db.prepare(`
   INSERT INTO inscricoes (
     nome, telefone, email, data_nascimento,
-    bairro, estado_civil, batizado, primeira_comunhao,
+    bairro, estado_civil, batizado,
+    fez_primeira_comunhao, primeira_comunhao,
     fez_ejc, ejc_local, fez_crisma, crisma_local,
     outra_pastoral, outra_pastoral_qual,
     domingo_1, domingo_2, ciente_compromisso,
     motivo, observacoes
   ) VALUES (
     @nome, @telefone, @email, @dataNascimento,
-    @bairro, @estadoCivil, @batizado, @primeiraComunhao,
+    @bairro, @estadoCivil, @batizado,
+    @fezPrimeiraComunhao, @primeiraComunhao,
     @fezEjc, @ejcLocal, @fezCrisma, @crismaLocal,
     @outraPastoral, @outraPastoralQual,
     @domingo1, @domingo2, @cienteCompromisso,
@@ -72,7 +76,8 @@ const insertStmt = db.prepare(`
 
 const listStmt = db.prepare(`
   SELECT id, nome, telefone, email, data_nascimento,
-         bairro, estado_civil, batizado, primeira_comunhao,
+         bairro, estado_civil, batizado,
+         fez_primeira_comunhao, primeira_comunhao,
          fez_ejc, ejc_local, fez_crisma, crisma_local,
          outra_pastoral, outra_pastoral_qual,
          domingo_1, domingo_2, ciente_compromisso,

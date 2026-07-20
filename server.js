@@ -36,6 +36,7 @@ app.post('/api/inscricoes', (req, res) => {
   const bairro = (body.bairro || '').trim();
   const estadoCivil = (body.estadoCivil || '').trim().toLowerCase();
   const batizado = toSimNao(body.batizado);
+  const fezPrimeiraComunhao = toSimNao(body.fezPrimeiraComunhao);
   const primeiraComunhao = (body.primeiraComunhao || '').trim();
   const fezEjc = toSimNao(body.fezEjc);
   const ejcLocal = (body.ejcLocal || '').trim();
@@ -58,7 +59,8 @@ app.post('/api/inscricoes', (req, res) => {
   if (bairro.length < 2) erros.push('Informe o bairro.');
   if (!['solteiro', 'casado', 'viuvo'].includes(estadoCivil)) erros.push('Selecione o estado civil.');
   if (batizado === null) erros.push('Informe se é batizado.');
-  if (primeiraComunhao.length < 2) erros.push('Responda sobre a primeira comunhão.');
+  if (fezPrimeiraComunhao === null) erros.push('Informe se fez a primeira comunhão.');
+  if (fezPrimeiraComunhao === 1 && primeiraComunhao.length < 2) erros.push('Informe onde/quando fez a primeira comunhão.');
   if (fezEjc === null) erros.push('Informe se fez EJC.');
   if (fezEjc === 1 && ejcLocal.length < 2) erros.push('Informe onde fez o EJC.');
   if (fezCrisma === null) erros.push('Informe se fez a crisma.');
@@ -85,7 +87,8 @@ app.post('/api/inscricoes', (req, res) => {
       bairro,
       estadoCivil,
       batizado,
-      primeiraComunhao,
+      fezPrimeiraComunhao,
+      primeiraComunhao: fezPrimeiraComunhao === 1 ? primeiraComunhao : '',
       fezEjc,
       ejcLocal: fezEjc === 1 ? ejcLocal : '',
       fezCrisma,
@@ -137,6 +140,7 @@ app.get('/api/inscricoes.csv', basicAuth, (req, res) => {
     'bairro',
     'estado_civil',
     'batizado',
+    'fez_primeira_comunhao',
     'primeira_comunhao',
     'fez_ejc',
     'ejc_local',
@@ -167,6 +171,7 @@ app.get('/api/inscricoes.csv', basicAuth, (req, res) => {
       i.bairro,
       i.estado_civil,
       simNao(i.batizado),
+      simNao(i.fez_primeira_comunhao),
       i.primeira_comunhao,
       simNao(i.fez_ejc),
       i.ejc_local,

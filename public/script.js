@@ -105,6 +105,7 @@
       bairro: form.bairro.value.trim(),
       estadoCivil: radioValor('estadoCivil'),
       batizado: radioValor('batizado'),
+      fezPrimeiraComunhao: radioValor('fezPrimeiraComunhao'),
       primeiraComunhao: form.primeiraComunhao.value.trim(),
       fezEjc: radioValor('fezEjc'),
       ejcLocal: form.ejcLocal.value.trim(),
@@ -126,7 +127,8 @@
     if (dados.bairro.length < 2) erros.push('Informe seu bairro.');
     if (!dados.estadoCivil) erros.push('Selecione seu estado civil.');
     if (!dados.batizado) erros.push('Informe se é batizado(a).');
-    if (dados.primeiraComunhao.length < 2) erros.push('Responda sobre a primeira comunhão.');
+    if (!dados.fezPrimeiraComunhao) erros.push('Informe se fez a primeira comunhão.');
+    if (dados.fezPrimeiraComunhao === '1' && dados.primeiraComunhao.length < 2) erros.push('Informe onde/quando fez a primeira comunhão.');
     if (!dados.fezEjc) erros.push('Informe se fez EJC.');
     if (dados.fezEjc === '1' && dados.ejcLocal.length < 2) erros.push('Informe onde fez o EJC.');
     if (!dados.fezCrisma) erros.push('Informe se fez a crisma.');

@@ -74,11 +74,17 @@
           </div>
         </fieldset>
 
-        <div class="campo">
-          <label for="primeiraComunhao">Fez a primeira comunhão? (se sim, onde/quando) <span class="obrigatorio">*</span></label>
-          <input type="text" id="primeiraComunhao" name="primeiraComunhao" required
-            placeholder="Ex: Sim, Paróquia São José em 2010 — ou 'Não fiz'" />
-        </div>
+        <fieldset class="opcoes">
+          <legend>Fez a primeira comunhão? <span class="obrigatorio">*</span></legend>
+          <div class="opcoes-linha">
+            <label><input type="radio" name="fezPrimeiraComunhao" value="1" required data-condicional="primeira-comunhao-local" /> Sim</label>
+            <label><input type="radio" name="fezPrimeiraComunhao" value="0" data-condicional="primeira-comunhao-local" /> Não</label>
+          </div>
+          <div class="campo condicional" id="primeira-comunhao-local" hidden>
+            <label for="primeiraComunhao">Onde/quando fez a primeira comunhão? <span class="obrigatorio">*</span></label>
+            <input type="text" id="primeiraComunhao" name="primeiraComunhao" placeholder="Paróquia / cidade / ano" />
+          </div>
+        </fieldset>
 
         <fieldset class="opcoes">
           <legend>Fez EJC? <span class="obrigatorio">*</span></legend>
