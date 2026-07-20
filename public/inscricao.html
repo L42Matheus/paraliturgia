@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Inscrição — Retiro da Paraliturgia</title>
+  <meta name="description" content="Formulário de inscrição para o Retiro Anual da Paraliturgia." />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="hero hero-slim">
+    <img src="/logo.png" alt="Pastoral da Paraliturgia" class="logo logo-sm" onerror="this.style.display='none'" />
+    <span class="badge">Inscrição</span>
+    <h1>Que Seja Você</h1>
+    <p class="lema">
+      "Já não sou eu quem vive, mas Cristo vive em mim." <cite>(Gl 2,20)</cite>
+    </p>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <p class="voltar-wrap">
+        <a href="/" class="voltar">&larr; Voltar para a página inicial</a>
+      </p>
+
+      <h2>Faça sua inscrição</h2>
+      <p class="dica">
+        Preencha seus dados e escolha <strong>dois domingos</strong> em que gostaria de servir.
+      </p>
+
+      <form id="form-inscricao" novalidate>
+        <div class="campo">
+          <label for="nome">Nome completo <span class="obrigatorio">*</span></label>
+          <input type="text" id="nome" name="nome" autocomplete="name" required />
+        </div>
+
+        <div class="grid-2">
+          <div class="campo">
+            <label for="telefone">Telefone / WhatsApp <span class="obrigatorio">*</span></label>
+            <input type="tel" id="telefone" name="telefone" placeholder="(00) 00000-0000" autocomplete="tel" required />
+          </div>
+          <div class="campo">
+            <label for="dataNascimento">Data de nascimento <span class="obrigatorio">*</span></label>
+            <input type="date" id="dataNascimento" name="dataNascimento" required />
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="email">E-mail <span class="obrigatorio">*</span></label>
+          <input type="email" id="email" name="email" autocomplete="email" required />
+        </div>
+
+        <div class="campo">
+          <label for="motivo">
+            Por que você gostaria de entrar (ou continuar) na Pastoral da Paraliturgia?
+            <span class="obrigatorio">*</span>
+          </label>
+          <textarea id="motivo" name="motivo" rows="4" required minlength="20"
+            placeholder="Compartilhe brevemente sua motivação — o que te levou até aqui e o que espera viver."></textarea>
+          <span class="ajuda">Mínimo de 20 caracteres.</span>
+        </div>
+
+        <fieldset class="domingos">
+          <legend>Domingos em que posso servir <span class="obrigatorio">*</span></legend>
+          <p class="dica">Escolha exatamente <strong>2 opções</strong>.</p>
+          <div class="domingos-opcoes" id="domingos-opcoes">
+            <label><input type="checkbox" name="domingos" value="1" /> 1º domingo</label>
+            <label><input type="checkbox" name="domingos" value="2" /> 2º domingo</label>
+            <label><input type="checkbox" name="domingos" value="3" /> 3º domingo</label>
+            <label><input type="checkbox" name="domingos" value="4" /> 4º domingo</label>
+          </div>
+          <p class="aviso-5domingo">
+            Nos meses com <strong>5º domingo</strong>, todos os grupos se reúnem para servir juntos.
+          </p>
+        </fieldset>
+
+        <div class="campo">
+          <label for="observacoes">Observações (opcional)</label>
+          <textarea id="observacoes" name="observacoes" rows="3" placeholder="Alguma informação que devemos saber?"></textarea>
+        </div>
+
+        <button type="submit" class="primario" id="btn-enviar">Confirmar inscrição</button>
+
+        <div class="mensagem" id="mensagem"></div>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    Pastoral da Paraliturgia — Retiro "Que Seja Você"
+  </footer>
+
+  <script src="/script.js"></script>
+</body>
+</html>

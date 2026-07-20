@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — Inscrições Paraliturgia</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    .admin-topo {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .stats {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .stat {
+      background: #fdfbf5;
+      border: 1px solid var(--borda);
+      border-radius: 10px;
+      padding: 12px 16px;
+      min-width: 130px;
+      text-align: center;
+    }
+    .stat .num {
+      display: block;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--azul-escuro);
+    }
+    .stat .rot {
+      font-size: 0.8rem;
+      color: var(--texto-suave);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .tabela-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--borda);
+      border-radius: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--branco);
+      font-size: 0.92rem;
+    }
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+      border-bottom: 1px solid var(--borda);
+      vertical-align: top;
+    }
+    th {
+      background: #eef2fb;
+      color: var(--azul-escuro);
+      position: sticky;
+      top: 0;
+    }
+    tr:last-child td { border-bottom: none; }
+    .tag {
+      display: inline-block;
+      background: #eef2fb;
+      color: var(--azul-escuro);
+      border: 1px solid #cfd8ee;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      margin-right: 4px;
+    }
+    .grupos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .grupo {
+      background: #fdfbf5;
+      border: 1px solid var(--borda);
+      border-radius: 10px;
+      padding: 14px;
+    }
+    .grupo h3 {
+      margin: 0 0 8px;
+      color: var(--azul-escuro);
+      font-size: 1rem;
+    }
+    .grupo ul { margin: 0; padding-left: 18px; color: var(--texto-suave); font-size: 0.9rem; }
+    .grupo .contador { color: var(--dourado); font-weight: 700; }
+    .btn-export {
+      background: var(--dourado);
+      color: var(--azul-escuro);
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-export:hover { filter: brightness(0.95); }
+    .vazio {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--texto-suave);
+    }
+    .motivo-cell {
+      max-width: 320px;
+      white-space: pre-wrap;
+      color: var(--texto-suave);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="hero" style="padding: 40px 24px;">
+    <img src="/logo.png" alt="Pastoral da Paraliturgia" class="logo logo-sm" onerror="this.style.display='none'" />
+    <span class="badge">Painel administrativo</span>
+    <h1 style="font-size: clamp(1.6rem, 4vw, 2.2rem);">Inscrições — Que Seja Você</h1>
+  </header>
+
+  <main class="container">
+    <section class="card">
+      <div class="admin-topo">
+        <div class="stats" id="stats"></div>
+        <a class="btn-export" href="/api/inscricoes.csv">Exportar CSV</a>
+      </div>
+
+      <h2>Por domingo</h2>
+      <div class="grupos" id="grupos"></div>
+
+      <h2>Todas as inscrições</h2>
+      <div class="tabela-wrap">
+        <table id="tabela">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nome</th>
+              <th>Telefone</th>
+              <th>E-mail</th>
+              <th>Nasc.</th>
+              <th>Domingos</th>
+              <th>Motivo</th>
+              <th>Observações</th>
+              <th>Enviado em</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    function escapeHtml(s) {
+      return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function formatarData(iso) {
+      if (!iso) return '';
+      const d = new Date(iso.includes('T') ? iso : iso.replace(' ', 'T') + 'Z');
+      if (isNaN(d)) return iso;
+      return d.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+    }
+
+    function formatarNasc(iso) {
+      if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return iso || '';
+      const [a, m, d] = iso.split('-');
+      return `${d}/${m}/${a}`;
+    }
+
+    async function carregar() {
+      const resp = await fetch('/api/inscricoes');
+      if (!resp.ok) {
+        document.body.innerHTML = '<p style="padding:40px;text-align:center;">Erro ao carregar. Faça login novamente.</p>';
+        return;
+      }
+      const { inscricoes } = await resp.json();
+
+      const statsEl = document.getElementById('stats');
+      statsEl.innerHTML = `
+        <div class="stat"><span class="num">${inscricoes.length}</span><span class="rot">Inscritos</span></div>
+      `;
+
+      const gruposEl = document.getElementById('grupos');
+      const contagem = { 1: [], 2: [], 3: [], 4: [] };
+      inscricoes.forEach((i) => {
+        contagem[i.domingo_1]?.push(i.nome);
+        contagem[i.domingo_2]?.push(i.nome);
+      });
+      gruposEl.innerHTML = [1, 2, 3, 4].map((n) => `
+        <div class="grupo">
+          <h3>${n}º domingo <span class="contador">(${contagem[n].length})</span></h3>
+          ${contagem[n].length
+            ? '<ul>' + contagem[n].map((nome) => `<li>${escapeHtml(nome)}</li>`).join('') + '</ul>'
+            : '<p style="margin:0;color:var(--texto-suave);font-size:0.9rem;">Ninguém ainda.</p>'}
+        </div>
+      `).join('');
+
+      const tbody = document.querySelector('#tabela tbody');
+      if (inscricoes.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="vazio">Nenhuma inscrição ainda.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = inscricoes.map((i) => `
+        <tr>
+          <td>${i.id}</td>
+          <td>${escapeHtml(i.nome)}</td>
+          <td>${escapeHtml(i.telefone)}</td>
+          <td>${escapeHtml(i.email)}</td>
+          <td>${formatarNasc(i.data_nascimento)}</td>
+          <td>
+            <span class="tag">${i.domingo_1}º</span>
+            <span class="tag">${i.domingo_2}º</span>
+          </td>
+          <td class="motivo-cell">${escapeHtml(i.motivo || '')}</td>
+          <td>${escapeHtml(i.observacoes || '')}</td>
+          <td>${formatarData(i.criado_em)}</td>
+        </tr>
+      `).join('');
+    }
+
+    carregar();
+  </script>
+</body>
+</html>
