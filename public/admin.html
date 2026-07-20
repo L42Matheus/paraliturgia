@@ -115,6 +115,40 @@
       color: var(--texto-suave);
       font-size: 0.9rem;
     }
+    .btn-det {
+      background: transparent;
+      border: 1px solid var(--azul-medio);
+      color: var(--azul-medio);
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+    .btn-det:hover { background: #eef2fb; }
+    .detalhes-row td {
+      background: #fdfbf5;
+      padding: 16px;
+    }
+    .detalhes-row.hidden { display: none; }
+    .detalhes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px 20px;
+    }
+    .detalhes-grid dt {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--texto-suave);
+      letter-spacing: 0.05em;
+      margin-bottom: 2px;
+    }
+    .detalhes-grid dd {
+      margin: 0 0 8px;
+      color: var(--texto);
+      font-size: 0.95rem;
+      white-space: pre-wrap;
+    }
+    .detalhes-grid .full { grid-column: 1 / -1; }
   </style>
 </head>
 <body>
@@ -142,12 +176,10 @@
               <th>#</th>
               <th>Nome</th>
               <th>Telefone</th>
-              <th>E-mail</th>
-              <th>Nasc.</th>
+              <th>Bairro</th>
               <th>Domingos</th>
-              <th>Motivo</th>
-              <th>Observações</th>
               <th>Enviado em</th>
+              <th></th>
             </tr>
           </thead>
           <tbody></tbody>
@@ -206,25 +238,53 @@
 
       const tbody = document.querySelector('#tabela tbody');
       if (inscricoes.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="vazio">Nenhuma inscrição ainda.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" class="vazio">Nenhuma inscrição ainda.</td></tr>';
         return;
       }
-      tbody.innerHTML = inscricoes.map((i) => `
+
+      const simNao = (v) => (v === 1 ? 'Sim' : 'Não');
+      const linha = (i) => `
         <tr>
           <td>${i.id}</td>
           <td>${escapeHtml(i.nome)}</td>
           <td>${escapeHtml(i.telefone)}</td>
-          <td>${escapeHtml(i.email)}</td>
-          <td>${formatarNasc(i.data_nascimento)}</td>
+          <td>${escapeHtml(i.bairro || '—')}</td>
           <td>
             <span class="tag">${i.domingo_1}º</span>
             <span class="tag">${i.domingo_2}º</span>
           </td>
-          <td class="motivo-cell">${escapeHtml(i.motivo || '')}</td>
-          <td>${escapeHtml(i.observacoes || '')}</td>
           <td>${formatarData(i.criado_em)}</td>
+          <td><button class="btn-det" data-id="${i.id}">Detalhes</button></td>
         </tr>
-      `).join('');
+        <tr class="detalhes-row hidden" id="det-${i.id}">
+          <td colspan="7">
+            <dl class="detalhes-grid">
+              <div><dt>E-mail</dt><dd>${escapeHtml(i.email)}</dd></div>
+              <div><dt>Nascimento</dt><dd>${formatarNasc(i.data_nascimento)}</dd></div>
+              <div><dt>Estado civil</dt><dd>${escapeHtml(i.estado_civil || '—')}</dd></div>
+              <div><dt>Batizado</dt><dd>${simNao(i.batizado)}</dd></div>
+              <div><dt>Primeira comunhão</dt><dd>${escapeHtml(i.primeira_comunhao || '—')}</dd></div>
+              <div><dt>EJC</dt><dd>${simNao(i.fez_ejc)}${i.fez_ejc === 1 && i.ejc_local ? ' — ' + escapeHtml(i.ejc_local) : ''}</dd></div>
+              <div><dt>Crisma</dt><dd>${simNao(i.fez_crisma)}${i.fez_crisma === 1 && i.crisma_local ? ' — ' + escapeHtml(i.crisma_local) : ''}</dd></div>
+              <div><dt>Outra pastoral</dt><dd>${simNao(i.outra_pastoral)}${i.outra_pastoral === 1 && i.outra_pastoral_qual ? ' — ' + escapeHtml(i.outra_pastoral_qual) : ''}</dd></div>
+              <div><dt>Ciente do compromisso</dt><dd>${simNao(i.ciente_compromisso)}</dd></div>
+              <div class="full"><dt>Motivo</dt><dd>${escapeHtml(i.motivo || '—')}</dd></div>
+              ${i.observacoes ? `<div class="full"><dt>Observações</dt><dd>${escapeHtml(i.observacoes)}</dd></div>` : ''}
+            </dl>
+          </td>
+        </tr>
+      `;
+      tbody.innerHTML = inscricoes.map(linha).join('');
+
+      tbody.addEventListener('click', (ev) => {
+        const btn = ev.target.closest('.btn-det');
+        if (!btn) return;
+        const alvo = document.getElementById('det-' + btn.dataset.id);
+        if (!alvo) return;
+        const aberto = !alvo.classList.contains('hidden');
+        alvo.classList.toggle('hidden');
+        btn.textContent = aberto ? 'Detalhes' : 'Fechar';
+      });
     }
 
     carregar();

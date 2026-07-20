@@ -50,6 +50,72 @@
           <input type="email" id="email" name="email" autocomplete="email" required />
         </div>
 
+        <h3 class="secao">Informações adicionais</h3>
+
+        <div class="campo">
+          <label for="bairro">Mora em qual bairro? <span class="obrigatorio">*</span></label>
+          <input type="text" id="bairro" name="bairro" autocomplete="address-level3" required />
+        </div>
+
+        <fieldset class="opcoes">
+          <legend>Estado civil <span class="obrigatorio">*</span></legend>
+          <div class="opcoes-linha">
+            <label><input type="radio" name="estadoCivil" value="solteiro" required /> Solteiro(a)</label>
+            <label><input type="radio" name="estadoCivil" value="casado" /> Casado(a)</label>
+            <label><input type="radio" name="estadoCivil" value="viuvo" /> Viúvo(a)</label>
+          </div>
+        </fieldset>
+
+        <fieldset class="opcoes">
+          <legend>É batizado(a)? <span class="obrigatorio">*</span></legend>
+          <div class="opcoes-linha">
+            <label><input type="radio" name="batizado" value="1" required /> Sim</label>
+            <label><input type="radio" name="batizado" value="0" /> Não</label>
+          </div>
+        </fieldset>
+
+        <div class="campo">
+          <label for="primeiraComunhao">Fez a primeira comunhão? (se sim, onde/quando) <span class="obrigatorio">*</span></label>
+          <input type="text" id="primeiraComunhao" name="primeiraComunhao" required
+            placeholder="Ex: Sim, Paróquia São José em 2010 — ou 'Não fiz'" />
+        </div>
+
+        <fieldset class="opcoes">
+          <legend>Fez EJC? <span class="obrigatorio">*</span></legend>
+          <div class="opcoes-linha">
+            <label><input type="radio" name="fezEjc" value="1" required data-condicional="ejc-local" /> Sim</label>
+            <label><input type="radio" name="fezEjc" value="0" data-condicional="ejc-local" /> Não</label>
+          </div>
+          <div class="campo condicional" id="ejc-local" hidden>
+            <label for="ejcLocal">Onde fez o EJC? <span class="obrigatorio">*</span></label>
+            <input type="text" id="ejcLocal" name="ejcLocal" placeholder="Paróquia / cidade / ano" />
+          </div>
+        </fieldset>
+
+        <fieldset class="opcoes">
+          <legend>Fez crisma? <span class="obrigatorio">*</span></legend>
+          <div class="opcoes-linha">
+            <label><input type="radio" name="fezCrisma" value="1" required data-condicional="crisma-local" /> Sim</label>
+            <label><input type="radio" name="fezCrisma" value="0" data-condicional="crisma-local" /> Não</label>
+          </div>
+          <div class="campo condicional" id="crisma-local" hidden>
+            <label for="crismaLocal">Onde fez a crisma? <span class="obrigatorio">*</span></label>
+            <input type="text" id="crismaLocal" name="crismaLocal" placeholder="Paróquia / cidade / ano" />
+          </div>
+        </fieldset>
+
+        <fieldset class="opcoes">
+          <legend>Participa de outra pastoral? <span class="obrigatorio">*</span></legend>
+          <div class="opcoes-linha">
+            <label><input type="radio" name="outraPastoral" value="1" required data-condicional="outra-pastoral-qual" /> Sim</label>
+            <label><input type="radio" name="outraPastoral" value="0" data-condicional="outra-pastoral-qual" /> Não</label>
+          </div>
+          <div class="campo condicional" id="outra-pastoral-qual" hidden>
+            <label for="outraPastoralQual">Qual pastoral? <span class="obrigatorio">*</span></label>
+            <input type="text" id="outraPastoralQual" name="outraPastoralQual" />
+          </div>
+        </fieldset>
+
         <div class="campo">
           <label for="motivo">
             Por que você gostaria de entrar (ou continuar) na Pastoral da Paraliturgia?
@@ -73,6 +139,16 @@
             Nos meses com <strong>5º domingo</strong>, todos os grupos se reúnem para servir juntos.
           </p>
         </fieldset>
+
+        <div class="campo checkbox-campo">
+          <label class="checkbox-linha">
+            <input type="checkbox" id="cienteCompromisso" name="cienteCompromisso" value="1" required />
+            <span>
+              Estou ciente que é meu dever <strong>participar dos encontros e reuniões
+              mensais da Pastoral</strong>. <span class="obrigatorio">*</span>
+            </span>
+          </label>
+        </div>
 
         <div class="campo">
           <label for="observacoes">Observações (opcional)</label>

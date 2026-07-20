@@ -146,6 +146,98 @@ form .ajuda {
   margin-top: 4px;
 }
 
+form .secao {
+  margin: 28px 0 14px;
+  padding: 10px 12px;
+  background: #eef2fb;
+  color: var(--azul-escuro);
+  border-left: 4px solid var(--dourado);
+  border-radius: 6px;
+  font-size: 1.05rem;
+}
+
+fieldset.opcoes {
+  border: 1px solid var(--borda);
+  border-radius: 10px;
+  padding: 14px 18px 10px;
+  background: #fdfbf5;
+  margin-bottom: 18px;
+}
+
+fieldset.opcoes legend {
+  font-weight: 600;
+  color: var(--azul-escuro);
+  padding: 0 8px;
+}
+
+.opcoes-linha {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.opcoes-linha label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid #d4cbb3;
+  border-radius: 8px;
+  background: var(--branco);
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--texto);
+  font-size: 0.95rem;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.opcoes-linha label:hover { background: #f7f0dd; }
+
+.opcoes-linha input[type="radio"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--azul-medio);
+  margin: 0;
+}
+
+.opcoes-linha label:has(input:checked) {
+  background: #eef2fb;
+  border-color: var(--azul-medio);
+}
+
+.campo.condicional {
+  margin: 12px 0 4px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--borda);
+}
+
+.campo.condicional[hidden] { display: none; }
+
+.checkbox-campo {
+  background: #fff8e5;
+  border: 1px dashed var(--dourado);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.checkbox-linha {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--texto);
+  margin: 0;
+}
+
+.checkbox-linha input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--azul-medio);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
 form input, form textarea {
   font: inherit;
   padding: 12px 14px;

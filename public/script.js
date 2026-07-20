@@ -31,6 +31,33 @@
     atualizarVisual();
   });
 
+  const condicionais = document.querySelectorAll('input[type="radio"][data-condicional]');
+  condicionais.forEach((r) => r.addEventListener('change', atualizarCondicionais));
+  atualizarCondicionais();
+
+  function atualizarCondicionais() {
+    const grupos = new Map();
+    condicionais.forEach((r) => {
+      const alvo = r.dataset.condicional;
+      if (!grupos.has(alvo)) grupos.set(alvo, false);
+      if (r.checked && r.value === '1') grupos.set(alvo, true);
+    });
+    for (const [id, mostrar] of grupos) {
+      const bloco = document.getElementById(id);
+      if (!bloco) continue;
+      bloco.hidden = !mostrar;
+      const input = bloco.querySelector('input, textarea');
+      if (input) {
+        if (mostrar) {
+          input.setAttribute('required', 'required');
+        } else {
+          input.removeAttribute('required');
+          input.value = '';
+        }
+      }
+    }
+  }
+
   telefoneEl.addEventListener('input', () => {
     const digits = telefoneEl.value.replace(/\D/g, '').slice(0, 11);
     let out = digits;
@@ -65,11 +92,27 @@
     esconderMensagem();
 
     const marcados = selecionadas().map((c) => Number(c.value));
+    const radioValor = (nome) => {
+      const el = form.querySelector(`input[name="${nome}"]:checked`);
+      return el ? el.value : '';
+    };
+
     const dados = {
       nome: form.nome.value.trim(),
       telefone: form.telefone.value.trim(),
       email: form.email.value.trim(),
       dataNascimento: form.dataNascimento.value,
+      bairro: form.bairro.value.trim(),
+      estadoCivil: radioValor('estadoCivil'),
+      batizado: radioValor('batizado'),
+      primeiraComunhao: form.primeiraComunhao.value.trim(),
+      fezEjc: radioValor('fezEjc'),
+      ejcLocal: form.ejcLocal.value.trim(),
+      fezCrisma: radioValor('fezCrisma'),
+      crismaLocal: form.crismaLocal.value.trim(),
+      outraPastoral: radioValor('outraPastoral'),
+      outraPastoralQual: form.outraPastoralQual.value.trim(),
+      cienteCompromisso: form.cienteCompromisso.checked ? '1' : '',
       motivo: form.motivo.value.trim(),
       observacoes: form.observacoes.value.trim(),
       domingos: marcados,
@@ -80,8 +123,19 @@
     if (dados.telefone.replace(/\D/g, '').length < 10) erros.push('Informe um telefone válido.');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(dados.email)) erros.push('Informe um e-mail válido.');
     if (!dados.dataNascimento) erros.push('Informe sua data de nascimento.');
-    if (dados.motivo.length < 20) erros.push('Conte-nos brevemente sua motivação (mínimo 20 caracteres).');
+    if (dados.bairro.length < 2) erros.push('Informe seu bairro.');
+    if (!dados.estadoCivil) erros.push('Selecione seu estado civil.');
+    if (!dados.batizado) erros.push('Informe se é batizado(a).');
+    if (dados.primeiraComunhao.length < 2) erros.push('Responda sobre a primeira comunhão.');
+    if (!dados.fezEjc) erros.push('Informe se fez EJC.');
+    if (dados.fezEjc === '1' && dados.ejcLocal.length < 2) erros.push('Informe onde fez o EJC.');
+    if (!dados.fezCrisma) erros.push('Informe se fez a crisma.');
+    if (dados.fezCrisma === '1' && dados.crismaLocal.length < 2) erros.push('Informe onde fez a crisma.');
+    if (!dados.outraPastoral) erros.push('Informe se participa de outra pastoral.');
+    if (dados.outraPastoral === '1' && dados.outraPastoralQual.length < 2) erros.push('Informe qual pastoral.');
     if (marcados.length !== 2) erros.push('Escolha exatamente 2 domingos.');
+    if (dados.cienteCompromisso !== '1') erros.push('Confirme que está ciente do compromisso com os encontros mensais.');
+    if (dados.motivo.length < 20) erros.push('Conte-nos brevemente sua motivação (mínimo 20 caracteres).');
 
     if (erros.length) {
       mostrarErro(erros);
@@ -104,6 +158,7 @@
         mostrarSucesso(dados.nome.split(' ')[0]);
         form.reset();
         atualizarVisual();
+        atualizarCondicionais();
         msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     } catch (err) {
