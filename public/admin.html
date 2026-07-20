@@ -39,6 +39,106 @@
       text-transform: uppercase;
       letter-spacing: 0.06em;
     }
+    .dashboard {
+      display: grid;
+      grid-template-columns: minmax(200px, 240px) 1fr;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 640px) {
+      .dashboard { grid-template-columns: 1fr; }
+    }
+    .card-total {
+      background: linear-gradient(135deg, var(--azul-escuro) 0%, var(--azul-medio) 100%);
+      color: var(--branco);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      box-shadow: 0 6px 18px rgba(27, 42, 78, 0.18);
+    }
+    .card-total .num {
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1;
+      color: var(--branco);
+    }
+    .card-total .rot {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #dcd3bd;
+      margin-top: 4px;
+    }
+    .card-chart {
+      background: #fdfbf5;
+      border: 1px solid var(--borda);
+      border-radius: 12px;
+      padding: 16px 20px;
+    }
+    .card-chart h4 {
+      margin: 0 0 12px;
+      color: var(--azul-escuro);
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .bar-row {
+      display: grid;
+      grid-template-columns: 44px 1fr 40px;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .bar-row:last-child { margin-bottom: 0; }
+    .bar-lbl {
+      font-weight: 700;
+      color: var(--azul-escuro);
+      font-size: 0.9rem;
+    }
+    .bar-track {
+      background: #eef2fb;
+      height: 18px;
+      border-radius: 9px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      background: linear-gradient(90deg, var(--dourado), #d4b56a);
+      height: 100%;
+      border-radius: 9px;
+      transition: width 0.4s ease;
+      min-width: 2px;
+    }
+    .bar-count {
+      color: var(--texto-suave);
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-align: right;
+    }
+    .card-resumo {
+      background: #fdfbf5;
+      border: 1px solid var(--borda);
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      align-items: center;
+      color: var(--texto);
+      font-size: 0.95rem;
+    }
+    .card-resumo strong {
+      color: var(--azul-escuro);
+      font-weight: 700;
+    }
+    .card-resumo .sep {
+      color: var(--dourado);
+      font-weight: 700;
+    }
     .tabela-wrap {
       overflow-x: auto;
       border: 1px solid var(--borda);
@@ -161,9 +261,12 @@
   <main class="container">
     <section class="card">
       <div class="admin-topo">
-        <div class="stats" id="stats"></div>
+        <h2 style="margin:0;">Dashboard</h2>
         <a class="btn-export" href="/api/inscricoes.csv">Exportar CSV</a>
       </div>
+
+      <div class="dashboard" id="dashboard"></div>
+      <div class="card-resumo" id="resumo" hidden></div>
 
       <h2>Por domingo</h2>
       <div class="grupos" id="grupos"></div>
@@ -216,17 +319,59 @@
       }
       const { inscricoes } = await resp.json();
 
-      const statsEl = document.getElementById('stats');
-      statsEl.innerHTML = `
-        <div class="stat"><span class="num">${inscricoes.length}</span><span class="rot">Inscritos</span></div>
-      `;
-
-      const gruposEl = document.getElementById('grupos');
       const contagem = { 1: [], 2: [], 3: [], 4: [] };
       inscricoes.forEach((i) => {
         contagem[i.domingo_1]?.push(i.nome);
         contagem[i.domingo_2]?.push(i.nome);
       });
+
+      const total = inscricoes.length;
+      const maxDomingo = Math.max(1, ...[1,2,3,4].map((n) => contagem[n].length));
+      const dashboardEl = document.getElementById('dashboard');
+      dashboardEl.innerHTML = `
+        <div class="card-total">
+          <span class="num">${total}</span>
+          <span class="rot">${total === 1 ? 'Inscrito' : 'Inscritos'}</span>
+        </div>
+        <div class="card-chart">
+          <h4>Distribuição por domingo</h4>
+          ${[1,2,3,4].map((n) => {
+            const c = contagem[n].length;
+            const pct = Math.round((c / maxDomingo) * 100);
+            return `
+              <div class="bar-row">
+                <span class="bar-lbl">${n}º dom.</span>
+                <div class="bar-track"><div class="bar-fill" style="width:${pct}%"></div></div>
+                <span class="bar-count">${c}</span>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+
+      const resumoEl = document.getElementById('resumo');
+      if (total > 0) {
+        const soma = (campo) => inscricoes.reduce((acc, i) => acc + (i[campo] === 1 ? 1 : 0), 0);
+        const batizados = soma('batizado');
+        const comunhao = soma('fez_primeira_comunhao');
+        const ejc = soma('fez_ejc');
+        const crisma = soma('fez_crisma');
+        const outraPastoral = soma('outra_pastoral');
+        const partes = [
+          `<span><strong>${total}</strong> ${total === 1 ? 'inscrito' : 'inscritos'}</span>`,
+          `<span><strong>${batizados}</strong> ${batizados === 1 ? 'batizado' : 'batizados'}</span>`,
+          `<span><strong>${comunhao}</strong> ${comunhao === 1 ? 'fez' : 'fizeram'} a 1ª comunhão</span>`,
+          `<span><strong>${ejc}</strong> ${ejc === 1 ? 'fez' : 'fizeram'} EJC</span>`,
+          `<span><strong>${crisma}</strong> ${crisma === 1 ? 'fez' : 'fizeram'} crisma</span>`,
+          `<span><strong>${outraPastoral}</strong> ${outraPastoral === 1 ? 'participa' : 'participam'} de outra pastoral</span>`,
+        ];
+        resumoEl.innerHTML = partes.join('<span class="sep">•</span>');
+        resumoEl.hidden = false;
+      } else {
+        resumoEl.hidden = true;
+      }
+
+      const gruposEl = document.getElementById('grupos');
       gruposEl.innerHTML = [1, 2, 3, 4].map((n) => `
         <div class="grupo">
           <h3>${n}º domingo <span class="contador">(${contagem[n].length})</span></h3>
